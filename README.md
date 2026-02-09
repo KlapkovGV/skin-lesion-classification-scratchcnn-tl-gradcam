@@ -33,3 +33,50 @@ Augmentations were visualized by displaying three pairs of original and augmente
 ## 5. Building the Scratch CNN Architecture
 
 Based on the proposed architecture, a convolutional neural network was built from the ground up. The model consists of four convolutional blocks featuring BatchNormalization, ReLU, MaxPooling, and Dropout. It concludes with a GlobalAveragePooling layer and two fully connected (Dense) layers with Dropout for regularization. The output layer contains a single neuron with a sigmoid activation function for binary classification. The model is ready for compilation and training.
+
+```mermaid
+graph TD
+    subgraph input
+        A[Input<br/>224×224×3]
+    end
+    
+    subgraph block1
+        B1[Conv2D<br/>32 filters, 3×3] --> B2[BatchNorm] --> B3[ReLU]
+        B3 --> C1[Conv2D<br/>32 filters, 3×3] --> C2[BatchNorm] --> C3[ReLU]
+        C3 --> D1[MaxPool2D 2×2] --> D2[Dropout 0.25]
+    end
+    
+    subgraph block2
+        E1[Conv2D<br/>64 filters, 3×3] --> E2[BatchNorm] --> E3[ReLU]
+        E3 --> F1[Conv2D<br/>64 filters, 3×3] --> F2[BatchNorm] --> F3[ReLU]
+        F3 --> G1[MaxPool2D 2×2] --> G2[Dropout 0.25]
+    end
+    
+    subgraph block3
+        H1[Conv2D<br/>128 filters, 3×3] --> H2[BatchNorm] --> H3[ReLU]
+        H3 --> I1[Conv2D<br/>128 filters, 3×3] --> I2[BatchNorm] --> I3[ReLU]
+        I3 --> J1[MaxPool2D 2×2] --> J2[Dropout 0.30]
+    end
+    
+    subgraph block4
+        K1[Conv2D<br/>256 filters, 3×3] --> K2[BatchNorm] --> K3[ReLU]
+        K3 --> L1[MaxPool2D 2×2] --> L2[Dropout 0.35]
+    end
+    
+    subgraph head
+        M[GlobalAveragePooling2D] --> N[Dense 128 + ReLU] --> O[Dropout 0.5] --> P[Dense 1 + Sigmoid]
+    end
+    
+    subgraph output
+        Q[Binary Output<br/>0/1]
+    end
+    
+    input --> block1
+    block1 --> block2
+    block2 --> block3
+    block3 --> block4
+    block4 --> head
+    head --> output
+```
+
+
