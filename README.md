@@ -151,3 +151,26 @@ The model architecture comprises 618,017 total parameters, with 616,129 of them 
 For the training strategy, the model was complied using the Adam optimizer with a learning rate of 10^(-3) and binary cross-entropy as the loss function. To optimize the process, several callbacks were integrated: **TensorBoard** was utilized for real-time visualization of metrics and weight distributions, while EarlyStopping (with a patience of 10 epochs) was employed to prevent overfitting by restoring the best weights. Additionally, ReduceLROnPlateau was implemented to adaptively scale down the learning rate if the validation loss stagnated. Although the maximum limit was set to 100 epochs, the training session was terminated early by the automated monitoring system.
 
 The training progress was evaluated through visualized learning curves for both loss and accuracy across training and validation sets. Final performance on the test set was assessed using Accuracy, Precision, Recall, F1-score, and ROC-AUC metrics. A Confusion Matrix was also generated to provide a detailed analysis of correct versus incorrect predictions.
+
+This model serves as a baseline for comparison with the more complex trasfer learning architectures (MobileNet and EfficientNet) to be implemented next.
+
+## 6. MobileNetV2 for Transfer Learning
+
+In accordance with the project requirements, MobileNetV2 was selected as the primary model for implementing transfer learning. This choice is justified by several critical architectural advantages that make it particalarly suitable for image classification.
+
+### Inverted Residual Connections
+
+Traditional residual connections follow an "expansion -> compressions -> expansion" scheme, but MobileNetV2 utilizes an inverted structure "compression → expansion → compression". As noted by Sandler et al. (2018), shortcuts connecting the bottlenecks perform significantly better than those connecting expanded layers, ensuring a more efficient gradient flow and improved overall performance. 
+
+<img width="821" height="363" alt="1" src="https://github.com/user-attachments/assets/90642477-0f98-4c2b-93da-15d6e5e396f0" />
+Figure from the research paper Sandler et al. (2018)
+
+### Linear Bottlenecks
+
+MobileNetV2 introduces linear bottlenecks instead of non-linear activations in its narrow layers. Research suggests that linear bottlenecks improve performance because non-linearity tends to destroy critical information when operating in low-dimensional spaces. By maintaining linearity in these layers, the model preserves more essential data throughout the feature extraction process.
+
+<img width="850" height="350" alt="2" src="https://github.com/user-attachments/assets/ab942b0b-10ed-4ca4-af8b-fb2b178360fe" />
+
+Figure from the research paper Sandler et al. (2018)
+
+Reference: MobileNetV2: Inverted Residuals and Linear Bottlenecks (CVPR 2018) https://arxiv.org/abs/1801.04381
