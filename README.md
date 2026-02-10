@@ -32,7 +32,7 @@ Augmentations were visualized by displaying three pairs of original and augmente
 
 ## 5. Building the Scratch CNN Architecture
 
-Based on the proposed architecture, a convolutional neural network was built from the ground up. The model consists of four convolutional blocks featuring BatchNormalization, ReLU, MaxPooling, and Dropout. It concludes with a GlobalAveragePooling layer and two fully connected (Dense) layers with Dropout for regularization. The output layer contains a single neuron with a sigmoid activation function for binary classification. The model is ready for compilation and training.
+A convolutional neural network was built from scratch according to the assignment specification. Based on the proposed architecture, the model consists of four convolutional blocks featuring BatchNormalization, ReLU, MaxPooling, and Dropout. It concludes with a GlobalAveragePooling layer and two fully connected (Dense) layers with Dropout for regularization. The output layer contains a single neuron with a sigmoid activation function for binary classification. The model is compiled and trained.
 
 ```mermaid
 graph TD
@@ -78,5 +78,76 @@ graph TD
     block4 --> head
     head --> output
 ```
+
+The architecture consists of four sequential convolutional blocks followed by classification layers.
+
+### Architectural Details:
+```python
+def build_scratch_cnn(input_shape=(224, 224, 3)):
+  model = models.Sequential()
+
+  # blok-1
+  model.add(layers.Conv2D(32, (3, 3), padding='same', input_shape=input_shape))
+  model.add(layers.BatchNormalization())
+  model.add(layers.ReLU())
+  model.add(layers.Conv2D(32, (3,3), padding='same'))
+  model.add(layers.BatchNormalization())
+  model.add(layers.ReLU())
+  model.add(layers.MaxPooling2D((2,2)))
+  model.add(layers.Dropout(0.25))
+
+  # blok-2
+  model.add(layers.Conv2D(64, (3,3), padding='same'))
+  model.add(layers.BatchNormalization())
+  model.add(layers.ReLU())
+  model.add(layers.Conv2D(64, (3,3), padding='same'))
+  model.add(layers.BatchNormalization())
+  model.add(layers.ReLU())
+  model.add(layers.MaxPooling2D((2,2)))
+  model.add(layers.Dropout(0.25))
+
+  # blok-3
+  model.add(layers.Conv2D(128, (3,3), padding='same'))
+  model.add(layers.BatchNormalization())
+  model.add(layers.ReLU())
+  model.add(layers.Conv2D(128, (3,3), padding='same'))
+  model.add(layers.BatchNormalization())
+  model.add(layers.ReLU())
+  model.add(layers.MaxPooling2D((2,2)))
+  model.add(layers.Dropout(0.3))
+
+  # blok-4
+  model.add(layers.Conv2D(256, (3,3), padding='same'))
+  model.add(layers.BatchNormalization())
+  model.add(layers.ReLU())
+  model.add(layers.MaxPooling2D((2,2)))
+  model.add(layers.Dropout(0.35))
+
+  # head
+  model.add(layers.GlobalAveragePooling2D())
+  model.add(layers.Dense(128, activation='relu'))
+  model.add(layers.Dropout(0.5))
+  model.add(layers.Dense(1, activation='sigmoid'))
+
+  return model
+```
+
+4 main convolutional blocks, each containing:
+- Conv2D with 3x3 kernels to extract local features and generate feature maps;
+- BatchNormalization to normalize activations, accelerate convergence, and stabilize training;
+- ReLU as the activation function to provide non-linearity and address the vanishing gradient problem;
+- MaxPooling2D with a 2x2 window to reduce spatial dimensions and retain dominant features;
+- Dropout with increasing probability (0.25 -> 0.35) for regularization and to prevent overfitting.
+
+Head:
+- ClobalAveragePooling2D to average each feature map across spatial dimensions, obtaining a fixed-length vector and reducing the number of paramenters;
+- Dense(128) fully connected layer with ReLU activation and Dropout(0.5);
+- Dense(1) output layer with sigmoid activation for binary classification.
+
+### Model Configuration and Training Performance
+
+The model architecture comprises 618,017 total parameters, with 616,129 of them being trainable. It is designed to process RGB images with an input size of `224x224x3`, ultimately producing a single probability value un the range of [0,1] for class 1 prediction.
+
+For the training strategy, the model was complied using the Adam optimizer with a learning rate of 10^(-3) and binary cross-entropy as the loss function. To optimize the process, several callbacks were integrated: **TensorBoard** was utilized for real-time visualization of metrics and weight distributions, while EarlyStopping (with a patience of 10 epochs) was employed to prevent overfitting by restoring the best weights. Additionally, ReduceLROnPlateau was implemented to adaptively scale down the learning rate if the validation loss stagnated. Although the maximum limit was set to 100 epochs, the training session was terminated early by the automated monitoring system.
 
 
