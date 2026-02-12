@@ -245,4 +245,4 @@ The coefficient φ is user-defined and controls how many additional resources ar
 
 Why it works better? The authors compared Class Activation Maps (CAM) for several scaled using different methods. All models were derived from the same baseline, EfficientNetB0, and had approximately four times more arithmetic operations than the original version. Images were selected randomly from the ImageNet validation set. The results clearly demonstrate the advantage of this approach:
 - the model with conpound scaling focuses on more revelent regions of the image and captures more object details;
-- other scaling methods either lose fine details or fail to capture all objexts within the image entirely. 
+- other scaling methods either lose fine details or fail to capture all objects within the image entirely. 
