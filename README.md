@@ -243,6 +243,6 @@ This is subject to the constraint: α · β² · γ² ≈ 2 where α ≥ 1, β �
 
 The coefficient φ is user-defined and controls how many additional resources are allocated. Since convolutional operation increase computational cost quadratically with respect to width and resolutionm β and γ are squared in the formula. 
 
-Why it works better? The authors compared Class Activation Maps (CAM) for several scaled using different methods. All models were derived from the same baseline, EfficientNetB0, and had approximately four times more arithmetic operations than the original version. Images were selected randomly from the ImageNet validation set. The results clearly demonstrate the advantage of this approach:
-- the model with conpound scaling focuses on more revelent regions of the image and captures more object details;
+Why it works better? The authors compared Class Activation Maps (CAM) for several model scaled using different methods. All models were derived from the same baseline, EfficientNetB0, and had approximately four times more arithmetic operations than the original version. Images were selected randomly from the ImageNet validation set. The results clearly demonstrate the advantage of this approach:
+- the model with compound scaling focuses on more revelent regions of the image and captures more object details;
 - other scaling methods either lose fine details or fail to capture all objects within the image entirely. 
