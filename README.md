@@ -163,7 +163,8 @@ In accordance with the project requirements, MobileNetV2 was selected as the pri
 Traditional residual connections follow an "expansion -> compressions -> expansion" scheme, but MobileNetV2 utilizes an inverted structure "compression → expansion → compression". As noted by Sandler et al. (2018), shortcuts connecting the bottlenecks perform significantly better than those connecting expanded layers, ensuring a more efficient gradient flow and improved overall performance. 
 
 <img width="821" height="363" alt="1" src="https://github.com/user-attachments/assets/90642477-0f98-4c2b-93da-15d6e5e396f0" />
-Figure from the research paper Sandler et al. (2018)
+
+Figure from Sandler et al. (2018)
 
 ### Linear Bottlenecks
 
@@ -171,7 +172,7 @@ MobileNetV2 introduces linear bottlenecks instead of non-linear activations in i
 
 <img width="850" height="350" alt="2" src="https://github.com/user-attachments/assets/ab942b0b-10ed-4ca4-af8b-fb2b178360fe" />
 
-Figure from the research paper Sandler et al. (2018)
+Figure from Sandler et al. (2018)
 
 Reference: MobileNetV2: Inverted Residuals and Linear Bottlenecks (CVPR 2018) https://arxiv.org/abs/1801.04381
 
@@ -206,3 +207,42 @@ Each parameter is broken down below:
 For Keras Application input preprocessing is included as part of the model (via a Rescaling layer). Consequently, `keras.applications.efficientnet.preprocess_input` serves as a pass-through function. EfficientNet models expect inputs to be float tensor with pixel values in the [0, 255] range, as the model performs internal scaling.
 
 Further research involved the original paper, "EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks" (ICMP 2019).
+
+### The EfficientNet Compound Scaling Method
+
+The core innovation of EfficientNet is not merely a new architecture, but a fundamentally different approach to scaling models. Rather than arbitrarily increasing a single parameter (depth, width, or resolution), the authors proposed **compound scaling** — a simultaneous and balanced increase of all three dimensions using a fixed coefficient. 
+
+<img width="1111" height="478" alt="3" src="https://github.com/user-attachments/assets/cc73dc3f-c4ac-4e25-9317-c3652d8359aa" />
+
+Figure from Tan and Le (2019)
+
+### The Scaling Problem
+
+The authors analyzed various approaches to scaling convolutional networks and formulated a key problem: how exactly should a model be enlarged to achieve maximum accuracy gains without an unjustified increase in computational costs? 
+
+### The First Key Finding
+
+Researchers confirmed that increasing any single dimension (depth, width, or resolution) does indeed improve accuracy. However, they discovered a fundamental limitation: **the effect of scaling saturates quickly**. As a model grows larger, the accuracy gain from further increasing just one parameter diminishes.
+
+To test their hypotheses, the authors conducted a series of experiments with compound scaling. For instance, they compared how width scaling performs under different network depths and resolutions. The result was telling:
+- if only the network width (w) is increased while keeping depth (d=1.0) and resolution (r=1.0) constant, accuracy quickly reaches a plateau;
+- however, if depth (d=2.0) and resolution (r=2.0) are increased simultaneously, width scaling yields nuch higher accuracy for the same computational  cost.
+
+### The Secound Decisive Conclusion
+
+Based on these experiments, the authors reached a critical conclusion: "To achieve better accuracy and efficiency, it is crucial to maintain a balance between all dimensions of the network — width, depth, and resolution — when scaling convolutional networks".
+
+The authors proposed a new method of combined scaling. The essence is simple and elegant: a compound coefficient **φ** is introduced to uniformly scale all three dimensions according to the following formulas:
+```text
+depth: d = α^φ
+width: w = β^φ
+resolution: r = γ^φ
+```
+
+This is subject to the constraint: α · β² · γ² ≈ 2 where α ≥ 1, β ≥ 1, γ ≥ 1 are constraints determined by a small grid search on the base model.
+
+The coefficient φ is user-defined and controls how many additional resources are allocated. Since convolutional operation increase computational cost quadratically with respect to width and resolutionm β and γ are squared in the formula. 
+
+Why it works better? The authors compared Class Activation Maps (CAM) for several scaled using different methods. All models were derived from the same baseline, EfficientNetB0, and had approximately four times more arithmetic operations than the original version. Images were selected randomly from the ImageNet validation set. The results clearly demonstrate the advantage of this approach:
+- the model with conpound scaling focuses on more revelent regions of the image and captures more object details;
+- other scaling methods either lose fine details or fail to capture all objexts within the image entirely. 
