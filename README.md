@@ -174,3 +174,35 @@ MobileNetV2 introduces linear bottlenecks instead of non-linear activations in i
 Figure from the research paper Sandler et al. (2018)
 
 Reference: MobileNetV2: Inverted Residuals and Linear Bottlenecks (CVPR 2018) https://arxiv.org/abs/1801.04381
+
+## 7. EfficientNetB0 for Transfer Learning
+
+EfficientNetB0 selected as the third model for transfer learning. The introduction to this model began with the Keras documentation website, which features eight version of EfficientNet. EfficientNetB0 was selected for this project as it is the base version of architecture.
+
+The function for creating the model on the description page is presented as follows:
+```python
+keras.application.EfficientNetB0(
+   include_top=True,
+   weights="imagenet",
+   input_tensor=None,
+   input_shape=None,
+   pooling=None,
+   classes=1000,
+   classifier_activation="softmax",
+   name="efficientnetb0",
+)
+```
+
+Each parameter is broken down below:
+- include_top (True/False): determines the "head" of the model;
+- weights (imagenet/None/custom): specifies the weight source;
+- input_tensor: an optimal parameter used to pass an existing tensor from `layers.Input() directly into the model;
+- input_shape: defines the input image dimensions (height, width, 3 channels);
+- pooling (None/avg/max): sets the pooling mode when `include_top=False`;
+- classes: the number of classification classes;
+- classifier_activation: the activation function for the output layer. The default is softmax for probabilities. It can be set to None to return raw logits. When using pre-trained weights, only None or softmax are permitted;
+- name: the designated name for the model within Keras.
+
+For Keras Application input preprocessing is included as part of the model (via a Rescaling layer). Consequently, `keras.applications.efficientnet.preprocess_input` serves as a pass-through function. EfficientNet models expect inputs to be float tensor with pixel values in the [0, 255] range, as the model performs internal scaling.
+
+Further research involved the original paper, "EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks" (ICMP 2019).
