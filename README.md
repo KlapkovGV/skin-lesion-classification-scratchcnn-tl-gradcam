@@ -246,3 +246,25 @@ The coefficient φ is user-defined and controls how many additional resources ar
 Why it works better? The authors compared Class Activation Maps (CAM) for several model scaled using different methods. All models were derived from the same baseline, EfficientNetB0, and had approximately four times more arithmetic operations than the original version. Images were selected randomly from the ImageNet validation set. The results clearly demonstrate the advantage of this approach:
 - the model with compound scaling focuses on more revelent regions of the image and captures more object details;
 - other scaling methods either lose fine details or fail to capture all objects within the image entirely. 
+
+## 8. Final Evaluation on the Test Set
+
+Once all three models have been trained, I evaluate them on the test set to determine the sest performer. For each model, I calculate accuracy, precision, recall, F1-score, ROC-AUC.
+
+| Model | Accuracy | Precision | Recall | F1-Score | ROC-AUC |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| Scratch CNN | - | - | - | - | - |
+| MobileNetV2 | - | - | - | - | - |
+| EfficientNetB0 | - | - | - | - | - |
+
+### Confusion matrix
+
+I visualize the confusion matrix for each of the three models to see specifically where they make mistakes.
+
+### ROC curve
+
+The ROC curve illustrates the diagnostic ability of the classifiers. Plotting all three curves on a single praph allows for a direct comparison: the closer the curve is to the top-left corner, the better the model.
+
+### Classification report
+
+The classification report provides a detailed breakdown of precision, recall, and f1-score for each individual class, along with the support.
