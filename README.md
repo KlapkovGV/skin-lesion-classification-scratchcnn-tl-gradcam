@@ -249,22 +249,79 @@ Why it works better? The authors compared Class Activation Maps (CAM) for severa
 
 ## 8. Final Evaluation on the Test Set
 
-Once all three models have been trained, I evaluate them on the test set to determine the sest performer. For each model, I calculate accuracy, precision, recall, F1-score, ROC-AUC.
+The three models were evaluated on the held-out test set using standard classification metrics: accuracy, precision, recall, F1-score, ROC-AUC. The results are summarized below.
 
 | Model | Accuracy | Precision | Recall | F1-Score | ROC-AUC |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| Scratch CNN | - | - | - | - | - |
-| MobileNetV2 | - | - | - | - | - |
-| EfficientNetB0 | - | - | - | - | - |
+| Scratch CNN | 0.846690 | 0.823662 | 0.870916	 | 0.846631	 | 0.935297 |
+| MobileNetV2 | 0.926442 | 0.937551 | 0.909163 | 0.923139 | 0.981997 |
+| EfficientNetB0 | 0.514131 | 0.000000 | 0.000000 | 0.000000 | 0.676021 |
+
+Scratch CNN was trained for 47 epochs. Starting with:
+```text
+Epoch 1/100
+377/377 ━━━━━━━━━━━━━━━━━━━━ 80s 150ms/step - accuracy: 0.7217 - auc: 0.7888 - loss: 0.5687 - precision: 0.6911 - recall: 0.7947 - val_accuracy: 0.7379 - val_auc: 0.8645 - val_loss: 0.5012 - val_precision: 0.6572 - val_recall: 0.9625 - learning_rate: 0.0010
+```
+and concluding with:
+```text
+poch 47/100
+377/377 ━━━━━━━━━━━━━━━━━━━━ 40s 105ms/step - accuracy: 0.8444 - auc: 0.9248 - loss: 0.3338 - precision: 0.8011 - recall: 0.9134 - val_accuracy: 0.8420 - val_auc: 0.9305 - val_loss: 0.3208 - val_precision: 0.8130 - val_recall: 0.8765 - learning_rate: 8.0000e-06
+```
+On the unseen data, the model demostrated balanced results: **Precision** of 0.823662 (82.4% of predicted Class 1 objects are indeed Class 1) and **Recall** of 0.870916 (the model detected 87.1% of all actual Class 1 objects). An **F1-score** of 0.846631 confirms a balance between precision and recall. An AUC of 0.935297 indicates ability to distinguish between classess. 
 
 ### Confusion matrix
 
 I visualize the confusion matrix for each of the three models to see specifically where they make mistakes.
 
+<img width="1770" height="486" alt="4" src="https://github.com/user-attachments/assets/1d4477be-8aa3-467c-9eea-1a8a8f7d0ece" />
+
 ### ROC curve
 
 The ROC curve illustrates the diagnostic ability of the classifiers. Plotting all three curves on a single praph allows for a direct comparison: the closer the curve is to the top-left corner, the better the model.
 
+<img width="989" height="790" alt="5" src="https://github.com/user-attachments/assets/fe4346ab-784e-41fc-bc7c-eb1731c39bde" />
+
 ### Classification report
 
 The classification report provides a detailed breakdown of precision, recall, and f1-score for each individual class, along with the support.
+
+Scratch CNN
+| Class | Precision | Recall | F1-Score | Support |
+| :--- | :---: | :---: | :---: | :---: |
+| Class 0 | 0.87 | 0.82 | 0.85 | 1328 |
+| Class 1 | 0.82 | 0.87 | 0.85 | 1255 |
+| **Accuracy** | | | **0.85** | **2583** |
+| **Macro Avg** | 0.85 | 0.85 | 0.85 | 2583 |
+| **Weighted Avg** | 0.85 | 0.85 | 0.85 | 2583 |
+
+MobileNetV2
+| Class | Precision | Recall | F1-Score | Support |
+| :--- | :---: | :---: | :---: | :---: |
+| Class 0 | 0.92 | 0.94 | 0.93 | 1328 |
+| Class 1 | 0.94 | 0.91 | 0.92 | 1255 |
+| **Accuracy** | | | **0.93** | **2583** |
+| **Macro Avg** | 0.93 | 0.93 | 0.93 | 2583 |
+| **Weighted Avg** | 0.93 | 0.93 | 0.93 | 2583 |
+
+EfficientNetB0
+| Class | Precision | Recall | F1-Score | Support |
+| :--- | :---: | :---: | :---: | :---: |
+| Class 0 | 0.51 | 1.00 | 0.68 | 1328 |
+| Class 1 | 0.00 | 0.00 | 0.00 | 1255 |
+| **Accuracy** | | | **0.51** | **2583** |
+| **Macro Avg** | 0.26 | 0.50 | 0.34 | 2583 |
+| **Weighted Avg** | 0.26 | 0.51 | 0.35 | 2583 |
+
+## 9. Gradient-weighted Class Activation Mapping
+
+### Scratch CNN
+
+<img width="1990" height="761" alt="6" src="https://github.com/user-attachments/assets/7397810e-6cea-44d6-a62c-cd95da5337d4" />
+
+### MobileNetV2
+
+<img width="1990" height="757" alt="8" src="https://github.com/user-attachments/assets/08d6369a-2f49-46d1-a766-7be088193845" />
+
+### EfficientNetB0
+
+<img width="1990" height="757" alt="7" src="https://github.com/user-attachments/assets/65eb70ee-4fe3-4301-a48c-d1954f2e60e8" />
