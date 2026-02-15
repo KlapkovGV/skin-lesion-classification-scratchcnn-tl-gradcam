@@ -35,48 +35,14 @@ Augmentations were visualized by displaying three pairs of original and augmente
 A convolutional neural network was built from scratch according to the assignment specification. Based on the proposed architecture, the model consists of four convolutional blocks featuring BatchNormalization, ReLU, MaxPooling, and Dropout. It concludes with a GlobalAveragePooling layer and two fully connected (Dense) layers with Dropout for regularization. The output layer contains a single neuron with a sigmoid activation function for binary classification. The model is compiled and trained.
 
 ```mermaid
-graph TD
-    subgraph input
-        A[Input<br/>224×224×3]
-    end
-    
-    subgraph block1
-        B1[Conv2D<br/>32 filters, 3×3] --> B2[BatchNorm] --> B3[ReLU]
-        B3 --> C1[Conv2D<br/>32 filters, 3×3] --> C2[BatchNorm] --> C3[ReLU]
-        C3 --> D1[MaxPool2D 2×2] --> D2[Dropout 0.25]
-    end
-    
-    subgraph block2
-        E1[Conv2D<br/>64 filters, 3×3] --> E2[BatchNorm] --> E3[ReLU]
-        E3 --> F1[Conv2D<br/>64 filters, 3×3] --> F2[BatchNorm] --> F3[ReLU]
-        F3 --> G1[MaxPool2D 2×2] --> G2[Dropout 0.25]
-    end
-    
-    subgraph block3
-        H1[Conv2D<br/>128 filters, 3×3] --> H2[BatchNorm] --> H3[ReLU]
-        H3 --> I1[Conv2D<br/>128 filters, 3×3] --> I2[BatchNorm] --> I3[ReLU]
-        I3 --> J1[MaxPool2D 2×2] --> J2[Dropout 0.30]
-    end
-    
-    subgraph block4
-        K1[Conv2D<br/>256 filters, 3×3] --> K2[BatchNorm] --> K3[ReLU]
-        K3 --> L1[MaxPool2D 2×2] --> L2[Dropout 0.35]
-    end
-    
-    subgraph head
-        M[GlobalAveragePooling2D] --> N[Dense 128 + ReLU] --> O[Dropout 0.5] --> P[Dense 1 + Sigmoid]
-    end
-    
-    subgraph output
-        Q[Binary Output<br/>0/1]
-    end
-    
-    input --> block1
-    block1 --> block2
-    block2 --> block3
-    block3 --> block4
-    block4 --> head
-    head --> output
+graph LR
+    A["Input<br>224x224x3"] --> B["Block 1<br>Conv2D(32)+BN+ReLU<br>Conv2D(32)+BN+ReLU<br>MaxPool2D<br>Dropout(0.25)<br>Output: 112x112x32"]
+    B --> C["Block 2<br>Conv2D(64)+BN+ReLU<br>Conv2D(64)+BN+ReLU<br>MaxPool2D<br>Dropout(0.25)<br>Output: 56x56x64"]
+    C --> D["Block 3<br>Conv2D(128)+BN+ReLU<br>Conv2D(128)+BN+ReLU<br>MaxPool2D<br>Dropout(0.30)<br>Output: 28x28x128"]
+    D --> E["Block 4<br>Conv2D(256)+BN+ReLU<br>MaxPool2D<br>Dropout(0.35)<br>Output: 14x14x256"]
+    E --> F["GlobalAveragePooling2D<br>Output: 256"]
+    F --> G["Dense(128)+ReLU<br>Dropout(0.5)"]
+    G --> H["Dense(1)+Sigmoid<br>Output: Binary Class"]
 ```
 
 The architecture consists of four sequential convolutional blocks followed by classification layers.
