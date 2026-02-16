@@ -223,17 +223,29 @@ The three models were evaluated on the held-out test set using standard classifi
 | MobileNetV2 | 0.926442 | 0.937551 | 0.909163 | 0.923139 | 0.981997 |
 | EfficientNetB0 | 0.514131 | 0.000000 | 0.000000 | 0.000000 | 0.676021 |
 
-Scratch CNN was trained for 47 epochs. Starting with:
+**Scratch CNN** was trained for 47 epochs. Training progress:
 ```text
 Epoch 1/100
 377/377 ━━━━━━━━━━━━━━━━━━━━ 80s 150ms/step - accuracy: 0.7217 - auc: 0.7888 - loss: 0.5687 - precision: 0.6911 - recall: 0.7947 - val_accuracy: 0.7379 - val_auc: 0.8645 - val_loss: 0.5012 - val_precision: 0.6572 - val_recall: 0.9625 - learning_rate: 0.0010
-```
-and concluding with:
-```text
-poch 47/100
+...
+Epoch 47/100
 377/377 ━━━━━━━━━━━━━━━━━━━━ 40s 105ms/step - accuracy: 0.8444 - auc: 0.9248 - loss: 0.3338 - precision: 0.8011 - recall: 0.9134 - val_accuracy: 0.8420 - val_auc: 0.9305 - val_loss: 0.3208 - val_precision: 0.8130 - val_recall: 0.8765 - learning_rate: 8.0000e-06
 ```
 On the unseen data, the model demostrated balanced results: **Precision** of 0.823662 (82.4% of predicted Class 1 objects are indeed Class 1) and **Recall** of 0.870916 (the model detected 87.1% of all actual Class 1 objects). An **F1-score** of 0.846631 confirms a balance between precision and recall. An AUC of 0.935297 indicates ability to distinguish between classess. 
+
+**MobileNetV2** was trained using transfer leraning with the architecture: base model (frozen) -> Dropout (0.3) -> Dense(128) -> Dropout(0.5) -> Dense(1). The model demonstrated performance from the first epoch and stopped training after 86 epoches with the following metrics:
+```text
+Epoch 1/100
+377/377 ━━━━━━━━━━━━━━━━━━━━ 0s 135ms/step - accuracy: 0.7258 - auc: 0.7974 - loss: 0.5636 - precision: 0.7186 - recall: 0.7383
+Epoch 1: val_loss improved from inf to 0.41747, saving model to mobile_feature_extraction_best.h5 
+377/377 ━━━━━━━━━━━━━━━━━━━━ 103s 214ms/step - accuracy: 0.7259 - auc: 0.7976 - loss: 0.5634 - precision: 0.7187 - recall: 0.7384 - val_accuracy: 0.8022 - val_auc: 0.8912 - val_loss: 0.4175 - val_precision: 0.7743 - val_recall: 0.8367 - learning_rate: 0.0010
+Epoch 86/100
+376/377 ━━━━━━━━━━━━━━━━━━━━ 0s 93ms/step - accuracy: 0.8740 - auc: 0.9490 - loss: 0.2896 - precision: 0.8543 - recall: 0.8992
+Epoch 86: ReduceLROnPlateau reducing learning rate to 8.000000525498762e-06.
+```
+After feature extraction, the final 25% of layers were unfrozen for fine-tuning. The model showed consistent improvement throughout training, achieving test metrics of 0.926442 accuracy, 0.937551 **Precision** (93.8% of predicted Class 1 objects are indeed Class 1) and 0.909163 **Recall** (the model detected 90.9% of all actual Class 1 objects). An **F1-score** of 0.923139 and **AUC** of 0.981997, making it the best-performing model in this study. 
+
+**EfficientNetB0** encountered significant training difficalties. Despite using the same transfer learning approach (base model (frozen) -> Dropout (0.3) -> Dense (128) -> Dropout (0.5) -> Dense (1)), the model failed to learn. Both training and validation metrics remained near random guessing levels (accuracy ~0.51, AUC ~0.50), and the model never predicted class 1 (resulting in zero precision and recall). Variou attempts were made to resolve this issue, including modifying the architecture, adjusting learning rates, and fine-tuning, but none proved successful. 
 
 ### Confusion matrix
 
@@ -241,11 +253,20 @@ I visualize the confusion matrix for each of the three models to see specificall
 
 <img width="1770" height="486" alt="4" src="https://github.com/user-attachments/assets/1d4477be-8aa3-467c-9eea-1a8a8f7d0ece" />
 
+The viaul analysis of the confusion matrices reveals the following performance characteristics for each model:
+
+**Scratch CNN** model demonstrate a solid baseline performance. It successfully identified 1094 instances of class 0 and 1093 instances of calss 1. However, it shows a tendency toward False Positives (234) compared to False Negatives (162).
+
+**MobileNetV2** is the clear top performer. It significantly increased correct predictions on the main diagonal (1252 for class 0 and 1141 for class 1). 
+
+For **EfficientNetB0** matrix highlights a complete model collapse. The network has defaulted to a majority class strategy, predicting class 0 for 100% of the input data. With zero correct predictions for class 1, this model failed to learn.
+
 ### ROC curve
 
 The ROC curve illustrates the diagnostic ability of the classifiers. Plotting all three curves on a single praph allows for a direct comparison: the closer the curve is to the top-left corner, the better the model.
 
 <img width="989" height="790" alt="5" src="https://github.com/user-attachments/assets/fe4346ab-784e-41fc-bc7c-eb1731c39bde" />
+
 
 ### Classification report
 
