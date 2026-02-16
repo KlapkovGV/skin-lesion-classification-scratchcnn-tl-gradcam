@@ -267,6 +267,10 @@ The ROC curve illustrates the diagnostic ability of the classifiers. Plotting al
 
 <img width="989" height="790" alt="5" src="https://github.com/user-attachments/assets/fe4346ab-784e-41fc-bc7c-eb1731c39bde" />
 
+The **Receiver Operating Characteristic (ROC)** curve and the **Area Under the Curve (AUC)** are fundamental metrics for evaluating the ability of distinguish of each model. These metrics illustrate how effectively each neural network distinguishes between classes as the classification threshold varies.
+
+The orange curve is positioned closet to the top-left corner, which represents the ideal behavior for a classifier. An AUC value of 0.9820 indicates that the model can achieve a very high True Positive Rate (Recall) with an almost negligible False Positive Rate.
+
 
 ### Classification report
 
