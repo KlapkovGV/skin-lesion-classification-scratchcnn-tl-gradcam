@@ -271,6 +271,10 @@ The **Receiver Operating Characteristic (ROC)** curve and the **Area Under the C
 
 The orange curve is positioned closet to the top-left corner, which represents the ideal behavior for a classifier. An AUC value of 0.9820 indicates that the model can achieve a very high True Positive Rate (Recall) with an almost negligible False Positive Rate.
 
+The blue curve also demostrates excellent results, following a path significantly above the diagonal reference line. Despite being a custom architecture built "from scratch", it shows strong performance with an AUC > 0.93.
+
+The green curve is notably lower than the others, indicating poor discriminatory power. This weak performance confirms the model collapse observed in the confusion matrix - the model failed to learn features and defaulted to predicting only the majority class.
+
 
 ### Classification report
 
@@ -304,6 +308,18 @@ EfficientNetB0
 | **Weighted Avg** | 0.26 | 0.51 | 0.35 | 2583 |
 
 ## 9. Gradient-weighted Class Activation Mapping
+
+I was genuinely fascinated when I discovered that heatmaps could be overlaid onto images to visualize where a neural network focuses its attention. This technique provides valuable insights into model interpretability, revealing the network examines clinically relevant regions or irrelevant artifacts.
+
+Initially, I attempted to implement Grad-CAM algorithm with assistance from an LLM. However, this generated code worked only for the Scratch CNN and consistently failed for MobileNetV2 and EfficientNetB0. I throughly investigated the network internals - examining layer names, architectures, and tensor shapes - but the issues remained unresolved. The problem appeared to lie in how images were being propagated through the different model architectures.
+
+I developed three separate visualization functions tailored to each model's architecture:
+
+For MobileNetV2, the program retrives the first batch from the test dataset and extracts a maximum of 6 images along with their labels, subsequently converting the data into numpy arrays. The `activation_map` function connects to an intermediate layer of the network (`out_relu`) to capture its outputm which reveal which regions of the image most strongly activate the neurons in that layer. For visualization, a 2 x 6 grid is created, where the top row displays the original images with their true labels, and the bottom row shows the images overlaid with an activation heatmap. The activation map is resized to 224 x 224 and applied using `jet` color scheme with 50% transparency. The resulting heatmap clearly demonstrates the specific areas the model focuses on whem making a decision: red zones indicate high activation and important features, while blue zones represent areas of low significance.
+
+The visualization process for EfficientNetB0 follows the same structure as for MobileNetV0. The key difference lies in the model and target layer: here, the `activation_map` function extracts activations from the `top_activation` layer of EfficientNetB0, which corresponds to a high-level convolutional layer before the final classification head. 
+
+For the scratch-built CNN, the visualization employs Grad-CAM, a more advanced technique compared to simple activation map. The `make_gradcam` function computes gradients of the model's output with respect to the activation of a target convolutional layer (`conv2d_6`), then weights these activations by their corresponding gradients to highlight region that most strongly influence the prediction. 
 
 ### Scratch CNN
 
