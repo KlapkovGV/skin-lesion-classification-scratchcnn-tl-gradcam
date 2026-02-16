@@ -24,11 +24,11 @@ An image preprocessing pipeline was implemented using `tf.data`, which includes 
 
 ## 3. Data Augmentation
 
-Data Augmentation was performed using a set of transformations from `tf.keras.layers`: rendom flips, rotations (5%), zoom (10%), as well as minimal adjustments to brightness and contrast (lower than 1%) with subsequent value clipping to the valid range. The pipeline supports caching, parallel processing, and data prefetching to accelerate training.
+Data Augmentation was performed using a set of transformations from `tf.keras.layers`: random flips, rotations (5%), zoom (10%), as well as minimal adjustments to brightness and contrast (lower than 1%) with subsequent value clipping to the valid range. The pipeline supports caching, parallel processing, and data prefetching to accelerate training.
 
 ## 4. Augmentation Visualization
 
-Augmentations were visualized by displaying three pairs of original and augmented images, confirming that the semantics were preserved and transformation were applied correctly.
+Augmentations were visualized by displaying three pairs of original and augmented images, confirming that the semantics were preserved and transformations were applied correctly.
 
 ## 5. Building the Scratch CNN Architecture
 
@@ -112,21 +112,21 @@ Head:
 
 ### Model Configuration and Training Performance
 
-The model architecture comprises 618,017 total parameters, with 616,129 of them being trainable. It is designed to process RGB images with an input size of `224x224x3`, ultimately producing a single probability value in the range of [0,1] for class 1 prediction.
+The model architecture comprises 618,017 total parameters, with 616,129 of them being trainable. It is designed to process RGB images with an input size of `224×224×3`, ultimately producing a single probability value in the range of [0,1] for class 1 prediction.
 
-For the training strategy, the model was complied using the Adam optimizer with a learning rate of 10^(-3) and binary cross-entropy as the loss function. To optimize the process, several callbacks were integrated: **TensorBoard** was utilized for real-time visualization of metrics and weight distributions, while EarlyStopping (with a patience of 10 epochs) was employed to prevent overfitting by restoring the best weights. Additionally, ReduceLROnPlateau was implemented to adaptively scale down the learning rate if the validation loss stagnated. Although the maximum limit was set to 100 epochs, the training session was terminated early by the automated monitoring system.
+For the training strategy, the model was **compiled** using the Adam optimizer with a learning rate of 10⁻³ and binary cross-entropy as the loss function. To optimize the process, several callbacks were integrated: **TensorBoard** was utilized for real-time visualization of metrics and weight distributions, while EarlyStopping (with a patience of 10 epochs) was employed to prevent overfitting by restoring the best weights. Additionally, ReduceLROnPlateau was implemented to adaptively scale down the learning rate if the validation loss stagnated. Although the maximum limit was set to 100 epochs, the training session was terminated early by the automated monitoring system.
 
 The training progress was evaluated through visualized learning curves for both loss and accuracy across training and validation sets. Final performance on the test set was assessed using Accuracy, Precision, Recall, F1-score, and ROC-AUC metrics. A Confusion Matrix was also generated to provide a detailed analysis of correct versus incorrect predictions.
 
-This model serves as a baseline for comparison with the more complex trasfer learning architectures (MobileNet and EfficientNet) to be implemented next.
+This model serves as a baseline for comparison with the more complex **transfer learning** architectures (MobileNetV2 and EfficientNetB0) to be implemented next.
 
 ## 6. MobileNetV2 for Transfer Learning
 
-In accordance with the project requirements, MobileNetV2 was selected as the primary model for implementing transfer learning. This choice is justified by several critical architectural advantages that make it particalarly suitable for image classification.
+In accordance with the project requirements, MobileNetV2 was selected as the primary model for implementing transfer learning. This choice is justified by several critical architectural advantages that make it **particularly** suitable for image classification.
 
 ### Inverted Residual Connections
 
-Traditional residual connections follow an "expansion -> compressions -> expansion" scheme, but MobileNetV2 utilizes an inverted structure "compression → expansion → compression". As noted by Sandler et al. (2018), shortcuts connecting the bottlenecks perform significantly better than those connecting expanded layers, ensuring a more efficient gradient flow and improved overall performance. 
+Traditional residual connections follow an "expansion → compression → expansion" scheme, but MobileNetV2 utilizes an inverted structure: **"compression → expansion → compression"**. As noted by Sandler et al. (2018), shortcuts connecting the bottlenecks perform significantly better than those connecting expanded layers, ensuring a more efficient gradient flow and improved overall performance.
 
 <img width="821" height="363" alt="1" src="https://github.com/user-attachments/assets/90642477-0f98-4c2b-93da-15d6e5e396f0" />
 
@@ -144,9 +144,9 @@ Reference: MobileNetV2: Inverted Residuals and Linear Bottlenecks (CVPR 2018) ht
 
 ## 7. EfficientNetB0 for Transfer Learning
 
-EfficientNetB0 selected as the third model for transfer learning. The introduction to this model began with the Keras documentation website, which features eight version of EfficientNet. EfficientNetB0 was selected for this project as it is the base version of architecture.
+EfficientNetB0 was selected as the third model for transfer learning. The introduction to this model began with the Keras documentation website, which features eight versions of EfficientNet. EfficientNetB0 was chosen for this project as it is the base version of the architecture.
 
-The function for creating the model on the description page is presented as follows:
+The function for creating the model, as presented in the documentation, is as follows:
 ```python
 keras.application.EfficientNetB0(
    include_top=True,
@@ -161,18 +161,19 @@ keras.application.EfficientNetB0(
 ```
 
 Each parameter is broken down below:
-- include_top (True/False): determines the "head" of the model;
-- weights (imagenet/None/custom): specifies the weight source;
-- input_tensor: an optimal parameter used to pass an existing tensor from `layers.Input() directly into the model;
-- input_shape: defines the input image dimensions (height, width, 3 channels);
-- pooling (None/avg/max): sets the pooling mode when `include_top=False`;
-- classes: the number of classification classes;
-- classifier_activation: the activation function for the output layer. The default is softmax for probabilities. It can be set to None to return raw logits. When using pre-trained weights, only None or softmax are permitted;
-- name: the designated name for the model within Keras.
 
-For Keras Application input preprocessing is included as part of the model (via a Rescaling layer). Consequently, `keras.applications.efficientnet.preprocess_input` serves as a pass-through function. EfficientNet models expect inputs to be float tensor with pixel values in the [0, 255] range, as the model performs internal scaling.
+- **include_top** (True/False): determines whether to include the fully-connected "head" of the model;
+- **weights** (imagenet/None/custom): specifies the weight source for initialization;
+- **input_tensor**: an optional parameter used to pass an existing tensor from `layers.Input()` directly into the model;
+- **input_shape**: defines the input image dimensions (height, width, 3 channels);
+- **pooling** (None/avg/max): sets the pooling mode when `include_top=False`;
+- **classes**: the number of classification classes;
+- **classifier_activation**: the activation function for the output layer. The default is `softmax` for probability outputs. It can be set to `None` to return raw logits. When using pre-trained weights, only `None` or `softmax` are permitted;
+- **name**: the designated name for the model within Keras.
 
-Further research involved the original paper, "EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks" (ICMP 2019).
+For Keras applications, input preprocessing is included as part of the model (via a Rescaling layer). Consequently, `keras.applications.efficientnet.preprocess_input` serves as a pass-through function. EfficientNet models expect inputs to be float tensors with pixel values in the [0, 255] range, as the model performs internal scaling.
+
+Further research involved the original paper, *"EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks"* (ICML 2019).
 
 ### The EfficientNet Compound Scaling Method
 
@@ -184,7 +185,7 @@ Figure from Tan and Le (2019)
 
 ### The Scaling Problem
 
-The authors analyzed various approaches to scaling convolutional networks and formulated a key problem: how exactly should a model be enlarged to achieve maximum accuracy gains without an unjustified increase in computational costs? 
+The authors analyzed various approaches to scaling convolutional networks and formulated a key problem: how exactly should a model be enlarged to achieve maximum accuracy gains without an unjustified increase in computational costs?
 
 ### The First Key Finding
 
@@ -192,13 +193,13 @@ Researchers confirmed that increasing any single dimension (depth, width, or res
 
 To test their hypotheses, the authors conducted a series of experiments with compound scaling. For instance, they compared how width scaling performs under different network depths and resolutions. The result was telling:
 - if only the network width (w) is increased while keeping depth (d=1.0) and resolution (r=1.0) constant, accuracy quickly reaches a plateau;
-- however, if depth (d=2.0) and resolution (r=2.0) are increased simultaneously, width scaling yields nuch higher accuracy for the same computational  cost.
+- however, if depth (d=2.0) and resolution (r=2.0) are increased simultaneously, width scaling yields **much** higher accuracy for the same computational cost.
 
-### The Secound Decisive Conclusion
+### The Second Decisive Conclusion
 
-Based on these experiments, the authors reached a critical conclusion: "To achieve better accuracy and efficiency, it is crucial to maintain a balance between all dimensions of the network — width, depth, and resolution — when scaling convolutional networks".
+Based on these experiments, the authors reached a critical conclusion: *"To achieve better accuracy and efficiency, it is crucial to balance all dimensions of the network — width, depth, and resolution — when scaling convolutional networks."*
 
-The authors proposed a new method of combined scaling. The essence is simple and elegant: a compound coefficient **φ** is introduced to uniformly scale all three dimensions according to the following formulas:
+The authors proposed a new method of **compound scaling**. The essence is simple and elegant: a compound coefficient **φ** is introduced to uniformly scale all three dimensions according to the following formulas:
 ```text
 depth: d = α^φ
 width: w = β^φ
@@ -207,15 +208,18 @@ resolution: r = γ^φ
 
 This is subject to the constraint: α · β² · γ² ≈ 2 where α ≥ 1, β ≥ 1, γ ≥ 1 are constraints determined by a small grid search on the base model.
 
-The coefficient φ is user-defined and controls how many additional resources are allocated. Since convolutional operation increase computational cost quadratically with respect to width and resolutionm β and γ are squared in the formula. 
+The coefficient **φ** is user-defined and controls how many additional resources are allocated. Since convolutional operations increase computational cost **quadratically** with respect to width and resolution, **β** and **γ** are squared in the formula.
 
-Why it works better? The authors compared Class Activation Maps (CAM) for several model scaled using different methods. All models were derived from the same baseline, EfficientNetB0, and had approximately four times more arithmetic operations than the original version. Images were selected randomly from the ImageNet validation set. The results clearly demonstrate the advantage of this approach:
-- the model with compound scaling focuses on more revelent regions of the image and captures more object details;
-- other scaling methods either lose fine details or fail to capture all objects within the image entirely. 
+### Why It Works Better
+
+The authors compared Class Activation Maps (CAM) for several models scaled using different methods. All models were derived from the same baseline, EfficientNetB0, and had approximately four times more arithmetic operations than the original version. Images were selected randomly from the ImageNet validation set. The results clearly demonstrate the advantage of this approach:
+
+- the model with compound scaling focuses on more **relevant** regions of the image and captures more object details;
+- other scaling methods either lose fine details or fail to capture all objects within the image entirely.
 
 ## 8. Final Evaluation on the Test Set
 
-The three models were evaluated on the held-out test set using standard classification metrics: accuracy, precision, recall, F1-score, ROC-AUC. The results are summarized below.
+The three models were evaluated on the held-out test set using standard classification metrics: Accuracy, Precision, Recall, F1-score, and ROC-AUC. The results are summarized below.
 
 | Model | Accuracy | Precision | Recall | F1-Score | ROC-AUC |
 | :--- | :---: | :---: | :---: | :---: | :---: |
@@ -253,32 +257,31 @@ I visualize the confusion matrix for each of the three models to see specificall
 
 <img width="1770" height="486" alt="4" src="https://github.com/user-attachments/assets/1d4477be-8aa3-467c-9eea-1a8a8f7d0ece" />
 
-The viaul analysis of the confusion matrices reveals the following performance characteristics for each model:
+The visual analysis of the confusion matrices reveals the following performance characteristics for each model:
 
-**Scratch CNN** model demonstrate a solid baseline performance. It successfully identified 1094 instances of class 0 and 1093 instances of calss 1. However, it shows a tendency toward False Positives (234) compared to False Negatives (162).
+**Scratch CNN** demonstrates a solid baseline performance. It successfully identified 1094 instances of class 0 and 1093 instances of class 1. However, it shows a tendency toward False Positives (234) compared to False Negatives (162).
 
-**MobileNetV2** is the clear top performer. It significantly increased correct predictions on the main diagonal (1252 for class 0 and 1141 for class 1). 
+**MobileNetV2** is the clear top performer. It significantly increased correct predictions on the main diagonal (1252 for class 0 and 1141 for class 1).
 
-For **EfficientNetB0** matrix highlights a complete model collapse. The network has defaulted to a majority class strategy, predicting class 0 for 100% of the input data. With zero correct predictions for class 1, this model failed to learn.
+For **EfficientNetB0**, the matrix highlights a complete model collapse. The network has defaulted to a majority class strategy, predicting class 0 for 100% of the input data. With zero correct predictions for class 1, this model failed to learn.
 
-### ROC curve
+### ROC Curve
 
-The ROC curve illustrates the diagnostic ability of the classifiers. Plotting all three curves on a single praph allows for a direct comparison: the closer the curve is to the top-left corner, the better the model.
+The ROC curve illustrates the diagnostic ability of the classifiers. Plotting all three curves on a single graph allows for a direct comparison: the closer the curve is to the top-left corner, the better the model.
 
 <img width="989" height="790" alt="5" src="https://github.com/user-attachments/assets/fe4346ab-784e-41fc-bc7c-eb1731c39bde" />
 
-The **Receiver Operating Characteristic (ROC)** curve and the **Area Under the Curve (AUC)** are fundamental metrics for evaluating the ability of distinguish of each model. These metrics illustrate how effectively each neural network distinguishes between classes as the classification threshold varies.
+The **Receiver Operating Characteristic (ROC)** curve and the **Area Under the Curve (AUC)** are fundamental metrics for evaluating the discriminative ability of each model. These metrics illustrate how effectively each neural network distinguishes between classes as the classification threshold varies.
 
-The orange curve is positioned closet to the top-left corner, which represents the ideal behavior for a classifier. An AUC value of 0.9820 indicates that the model can achieve a very high True Positive Rate (Recall) with an almost negligible False Positive Rate.
+The orange curve is positioned closest to the top-left corner, which represents the ideal behavior for a classifier. An AUC value of 0.9820 indicates that the model can achieve a very high True Positive Rate (Recall) with an almost negligible False Positive Rate.
 
-The blue curve also demostrates excellent results, following a path significantly above the diagonal reference line. Despite being a custom architecture built "from scratch", it shows strong performance with an AUC > 0.93.
+The blue curve also demonstrates excellent results, following a path significantly above the diagonal reference line. Despite being a custom architecture built "from scratch", it shows strong performance with an AUC > 0.93.
 
-The green curve is notably lower than the others, indicating poor discriminatory power. This weak performance confirms the model collapse observed in the confusion matrix - the model failed to learn features and defaulted to predicting only the majority class.
+The green curve is notably lower than the others, indicating poor discriminatory power. This weak performance confirms the model collapse observed in the confusion matrix — the model failed to learn features and defaulted to predicting only the majority class.
 
+### Classification Report
 
-### Classification report
-
-The classification report provides a detailed breakdown of precision, recall, and f1-score for each individual class, along with the support.
+The classification report provides a detailed breakdown of precision, recall, and F1-score for each individual class, along with the support.
 
 Scratch CNN
 | Class | Precision | Recall | F1-Score | Support |
@@ -309,17 +312,17 @@ EfficientNetB0
 
 ## 9. Gradient-weighted Class Activation Mapping
 
-I was genuinely fascinated when I discovered that heatmaps could be overlaid onto images to visualize where a neural network focuses its attention. This technique provides valuable insights into model interpretability, revealing the network examines clinically relevant regions or irrelevant artifacts.
+I was genuinely fascinated when I discovered that heatmaps could be overlaid onto images to visualize where a neural network focuses its attention. This technique provides valuable insights into model interpretability, revealing whether the network examines clinically relevant regions or irrelevant artifacts.
 
-Initially, I attempted to implement Grad-CAM algorithm with assistance from an LLM. However, this generated code worked only for the Scratch CNN and consistently failed for MobileNetV2 and EfficientNetB0. I throughly investigated the network internals - examining layer names, architectures, and tensor shapes - but the issues remained unresolved. The problem appeared to lie in how images were being propagated through the different model architectures.
+Initially, I attempted to implement a Grad-CAM algorithm with assistance from an LLM. However, this generated code worked only for the Scratch CNN and consistently failed for MobileNetV2 and EfficientNetB0. I thoroughly investigated the network internals — examining layer names, architectures, and tensor shapes — but the issues remained unresolved. The problem appeared to lie in how images were being propagated through the different model architectures.
 
 I developed three separate visualization functions tailored to each model's architecture:
 
-For MobileNetV2, the program retrives the first batch from the test dataset and extracts a maximum of 6 images along with their labels, subsequently converting the data into numpy arrays. The `activation_map` function connects to an intermediate layer of the network (`out_relu`) to capture its outputm which reveal which regions of the image most strongly activate the neurons in that layer. For visualization, a 2 x 6 grid is created, where the top row displays the original images with their true labels, and the bottom row shows the images overlaid with an activation heatmap. The activation map is resized to 224 x 224 and applied using `jet` color scheme with 50% transparency. The resulting heatmap clearly demonstrates the specific areas the model focuses on whem making a decision: red zones indicate high activation and important features, while blue zones represent areas of low significance.
+For MobileNetV2, the program retrieves the first batch from the test dataset and extracts a maximum of 6 images along with their labels, subsequently converting the data into NumPy arrays. The `activation_map` function connects to an intermediate layer of the network (`out_relu`) to capture its output, which reveals which regions of the image most strongly activate the neurons in that layer. For visualization, a 2×6 grid is created, where the top row displays the original images with their true labels, and the bottom row shows the images overlaid with an activation heatmap. The activation map is resized to 224×224 and applied using the `jet` color scheme with 50% transparency. The resulting heatmap clearly demonstrates the specific areas the model focuses on when making a decision: red zones indicate high activation and important features, while blue zones represent areas of low significance.
 
-The visualization process for EfficientNetB0 follows the same structure as for MobileNetV0. The key difference lies in the model and target layer: here, the `activation_map` function extracts activations from the `top_activation` layer of EfficientNetB0, which corresponds to a high-level convolutional layer before the final classification head. 
+The visualization process for EfficientNetB0 follows the same structure as for MobileNetV2. The key difference lies in the model and target layer: here, the `activation_map` function extracts activations from the `top_activation` layer of EfficientNetB0, which corresponds to a high-level convolutional layer before the final classification head.
 
-For the scratch-built CNN, the visualization employs Grad-CAM, a more advanced technique compared to simple activation map. The `make_gradcam` function computes gradients of the model's output with respect to the activation of a target convolutional layer (`conv2d_6`), then weights these activations by their corresponding gradients to highlight region that most strongly influence the prediction. 
+For the scratch-built CNN, the visualization employs Grad-CAM, a more advanced technique compared to simple activation maps. The `make_gradcam` function computes gradients of the model's output with respect to the activation of a target convolutional layer (`conv2d_6`), then weights these activations by their corresponding gradients to highlight regions that most strongly influence the prediction.
 
 ### Scratch CNN
 
